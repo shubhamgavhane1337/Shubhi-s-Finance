@@ -37,6 +37,16 @@
     transform: translateY(-2px);
 }
 
+/* Fix desktop sidebar vertical stretch */
+@media (min-width: 768px) {
+    .nav-item {
+        flex: none;
+        width: 100%;
+        padding: var(--spacing-3) var(--spacing-4);
+        margin-bottom: var(--spacing-1);
+    }
+}
+
 /* Floating Action Button inside Nav */
 .fab-item {
     position: relative;
