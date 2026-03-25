@@ -37,6 +37,41 @@
     transform: translateY(-2px);
 }
 
+/* Fix desktop sidebar vertical stretch */
+@media (min-width: 768px) {
+    .nav-item {
+        flex: none !important;
+        width: 100%;
+        padding: var(--spacing-3) var(--spacing-4);
+        margin-bottom: var(--spacing-1);
+    }
+}
+
+/* History Transaction Actions */
+.tx-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px;
+    border-radius: var(--border-radius-sm);
+    z-index: 20;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+}
+
+.tx-actions:hover {
+    opacity: 1;
+}
+
+.tx-actions button {
+    padding: 4px;
+}
+
 /* Floating Action Button inside Nav */
 .fab-item {
     position: relative;
