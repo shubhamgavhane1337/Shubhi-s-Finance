@@ -271,3 +271,46 @@
     border: 2px solid var(--clr-primary);
     box-shadow: var(--shadow-glow);
 }
+
+/* Responsive Utilities (md: breakpoint) */
+@media (min-width: 768px) {
+    .md\:flex-row {
+        flex-direction: row !important;
+    }
+    .md\:items-center {
+        align-items: center !important;
+    }
+    .md\:p-5 {
+        padding: var(--spacing-5) !important;
+    }
+    .md\:pr-0 {
+        padding-right: 0 !important;
+    }
+    .md\:pr-20 {
+        padding-right: 5rem !important; /* ~80px */
+    }
+    .md\:mt-0 {
+        margin-top: 0 !important;
+    }
+    .md\:pt-0 {
+        padding-top: 0 !important;
+    }
+    .md\:w-auto {
+        width: auto !important;
+    }
+    .md\:border-0 {
+        border: none !important;
+    }
+    .md\:opacity-0 {
+        opacity: 0 !important;
+    }
+    .md\:text-left {
+        text-align: left !important;
+    }
+    .md\:text-right {
+        text-align: right !important;
+    }
+    .md\:p-3 {
+        padding: var(--spacing-3) !important;
+    }
+}

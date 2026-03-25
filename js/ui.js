@@ -1241,11 +1241,18 @@ class UIManager {
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="dept-container">
                             <label class="form-label">Department</label>
                             <select id="tx-dept" class="form-select" disabled>
                                 <option value="">None</option>
                             </select>
+                        </div>
+
+                        <div id="bulk-split-section" class="form-group" style="display: none; background: rgba(0,0,0,0.2); border: 1px solid var(--clr-primary); padding: 10px; border-radius: 8px;">
+                            <label class="form-label text-primary">Bulk Split (Turf Mode)</label>
+                            <div class="text-xs text-muted mb-2">Select players and number of shares (people they are playing for).</div>
+                            <div id="bulk-players-container" class="max-h-60 overflow-y-auto mb-2 custom-scrollbar pr-2 block"></div>
+                            <div id="bulk-split-summary" class="text-sm font-bold text-success border-t border-light pt-2"></div>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-full mt-4 justify-center py-3">Save Transaction</button>
@@ -1284,14 +1291,82 @@ class UIManager {
         subSelect.addEventListener('change', (e) => {
             const subId = e.target.value;
             const depts = store.getDepartments(subId);
-            if (depts.length > 0 && subId) {
-                deptSelect.innerHTML = `<option value="">Select Department (Optional)</option>` +
-                    depts.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
-                deptSelect.disabled = false;
-            } else {
-                deptSelect.innerHTML = '<option value="">None</option>';
+            const subAccount = store.data.subAccounts.find(s => s.id === subId);
+            const isTurf = subAccount && subAccount.name.toLowerCase().includes('turf');
+            
+            const deptContainer = document.getElementById('dept-container');
+            const bulkSection = document.getElementById('bulk-split-section');
+            const bulkContainer = document.getElementById('bulk-players-container');
+
+            if (isTurf && depts.length > 0) {
+                // Activate Bulk Split Mode
+                deptContainer.style.display = 'none';
+                deptSelect.value = '';
                 deptSelect.disabled = true;
+                
+                bulkSection.style.display = 'block';
+                bulkContainer.innerHTML = depts.map(d => `
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="flex items-center text-sm cursor-pointer flex-1 text-white">
+                            <input type="checkbox" class="mr-2 bulk-player-check form-checkbox" data-deptid="${d.id}" checked>
+                            ${d.name}
+                        </label>
+                        <div class="flex items-center ml-2">
+                            <span class="text-xs text-muted mr-2">Shares:</span>
+                            <input type="number" class="bulk-player-shares w-16 bg-surface text-center p-1 rounded border border-light text-sm" data-deptid="${d.id}" value="1" min="1">
+                        </div>
+                    </div>
+                `).join('');
+                
+                updateBulkSummary();
+                
+                // Add listeners to new inputs
+                bulkContainer.querySelectorAll('input').forEach(input => {
+                    input.addEventListener('change', updateBulkSummary);
+                    input.addEventListener('input', updateBulkSummary);
+                });
+                
+            } else {
+                // Normal Mode
+                bulkSection.style.display = 'none';
+                bulkContainer.innerHTML = '';
+                deptContainer.style.display = 'flex';
+                
+                if (depts.length > 0 && subId) {
+                    deptSelect.innerHTML = `<option value="">Select Department (Optional)</option>` +
+                        depts.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                    deptSelect.disabled = false;
+                } else {
+                    deptSelect.innerHTML = '<option value="">None</option>';
+                    deptSelect.disabled = true;
+                }
             }
+        });
+
+        const updateBulkSummary = () => {
+            const amount = parseFloat(document.getElementById('tx-amount').value) || 0;
+            const checks = document.querySelectorAll('.bulk-player-check:checked');
+            let totalShares = 0;
+            
+            checks.forEach(chk => {
+                const deptId = chk.dataset.deptid;
+                const sharesInput = document.querySelector(`.bulk-player-shares[data-deptid="${deptId}"]`);
+                totalShares += parseInt(sharesInput.value) || 1;
+            });
+            
+            const summaryDiv = document.getElementById('bulk-split-summary');
+            if (totalShares > 0) {
+                const perShare = amount / totalShares;
+                summaryDiv.innerHTML = `Split across ${totalShares} total shares. Cost per share: ${this.formatCurrency(perShare)}`;
+            } else {
+                summaryDiv.innerHTML = 'Select at least one player to split.';
+            }
+        };
+
+        document.getElementById('tx-amount').addEventListener('input', () => {
+             if (document.getElementById('bulk-split-section').style.display === 'block') {
+                 updateBulkSummary();
+             }
         });
 
         // Close logic
@@ -1315,14 +1390,53 @@ class UIManager {
             const subId = subSelect.value;
             const deptId = deptSelect.value;
 
-            store.addTransaction({
-                type: txType,
-                amount: amount,
-                date: date,
-                accountId: accId,
-                subAccountId: subId || null,
-                departmentId: deptId || null
-            });
+            const bulkSection = document.getElementById('bulk-split-section');
+            if (bulkSection && bulkSection.style.display === 'block') {
+                // Turf Bulk Split Submit
+                const checks = document.querySelectorAll('.bulk-player-check:checked');
+                let totalShares = 0;
+                const players = [];
+                
+                checks.forEach(chk => {
+                    const dId = chk.dataset.deptid;
+                    const shares = parseInt(document.querySelector(`.bulk-player-shares[data-deptid="${dId}"]`).value) || 1;
+                    totalShares += shares;
+                    players.push({ id: dId, shares });
+                });
+                
+                if (totalShares === 0) {
+                    alert('Please select at least one player to split the amount.');
+                    return;
+                }
+                
+                const perShareAmount = amount / totalShares;
+                const transactions = [];
+                
+                players.forEach(p => {
+                    const playerShareAmount = perShareAmount * p.shares;
+                    transactions.push({
+                        type: txType,
+                        amount: playerShareAmount,
+                        date: date,
+                        accountId: accId,
+                        subAccountId: subId,
+                        departmentId: p.id,
+                        note: `Bulk Split (${p.shares} share${p.shares > 1 ? 's' : ''})`
+                    });
+                });
+                
+                store.addBulkTransactions(transactions);
+            } else {
+                // Normal Submit
+                store.addTransaction({
+                    type: txType,
+                    amount: amount,
+                    date: date,
+                    accountId: accId,
+                    subAccountId: subId || null,
+                    departmentId: deptId || null
+                });
+            }
 
             closeModal();
             // Optional Toast Notification

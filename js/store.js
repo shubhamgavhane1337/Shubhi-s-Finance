@@ -289,6 +289,18 @@ class Store {
         return newTx;
     }
 
+    addBulkTransactions(transactionsArray) {
+        const newTxs = transactionsArray.map(tx => ({
+            id: this.generateId(),
+            ...tx
+        }));
+        
+        this.data.transactions.push(...newTxs);
+        this.recalculateBalances();
+        this.saveData();
+        return newTxs;
+    }
+
     deleteTransaction(id) {
         this.data.transactions = this.data.transactions.filter(t => t.id !== id);
         this.recalculateBalances();
