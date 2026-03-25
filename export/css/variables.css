@@ -1,0 +1,89 @@
+/* Vibrant, Colorful Design System Setup */
+:root {
+    /* Base Colors - Deep Vibrant Theme */
+    --clr-bg-dark: #0f172a;
+    /* Deep Slate Blue */
+    --clr-bg-card: #1e293b;
+    /* Lighter Slate Blue for Cards */
+    --clr-bg-card-hover: #334155;
+    --clr-surface: #1e293b;
+
+    /* Text Colors */
+    --clr-text-main: #f8fafc;
+    --clr-text-muted: #94a3b8;
+    --clr-text-inverse: #020617;
+
+    /* Accents (Vibrant Colorful Palette) */
+    --clr-primary: #8b5cf6;
+    /* Vibrant Purple */
+    --clr-primary-variant: #6d28d9;
+    --clr-secondary: #06b6d4;
+    /* Cyan */
+    --clr-accent: #f43f5e;
+    /* Rose / Pink */
+
+    /* Semantic Colors */
+    --clr-success: #10b981;
+    /* Emerald Green */
+    --clr-success-bg: rgba(16, 185, 129, 0.15);
+    --clr-danger: #ef4444;
+    /* Red */
+    --clr-danger-bg: rgba(239, 68, 68, 0.15);
+    --clr-warning: #f59e0b;
+    /* Amber */
+
+    /* Gradients (Vibrant) */
+    --gradient-primary: linear-gradient(135deg, var(--clr-primary), var(--clr-primary-variant));
+    --gradient-accent: linear-gradient(135deg, var(--clr-secondary), var(--clr-primary));
+    --gradient-aurora: linear-gradient(to right, var(--clr-primary), var(--clr-secondary), var(--clr-accent));
+    --gradient-gemini: linear-gradient(to right, var(--clr-secondary), var(--clr-primary));
+
+    /* Typography */
+    --font-family-main: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-size-xs: 0.8rem;
+    --font-size-sm: 0.9rem;
+    --font-size-md: 1.05rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 1.75rem;
+    --font-size-3xl: 2.25rem;
+
+    /* Spacing */
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 1.5rem;
+    --spacing-8: 2rem;
+
+    /* Borders & Outlines - Stronger definition */
+    --border-radius-sm: 6px;
+    --border-radius-md: 10px;
+    --border-radius-lg: 14px;
+    --border-radius-xl: 20px;
+    --border-radius-pill: 9999px;
+    --border-light: rgba(255, 255, 255, 0.2);
+
+    /* Shadows - Glowing & Soft */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 6px 12px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 15px rgba(139, 92, 246, 0.4);
+
+    /* Glass Effect Returns */
+    --glass-bg: rgba(30, 41, 59, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-border-highlight: rgba(139, 92, 246, 0.5);
+    --glass-blur: blur(12px);
+    --glass-inner-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 400ms ease;
+
+    /* Layout Constants */
+    --bottom-nav-height: 72px;
+    --sidebar-width: 240px;
+}

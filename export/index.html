@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Shubhi's Finance</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Material Icons (Rounded) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+
+    <!-- Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+    <!-- App Styles -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/calculator.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Main Content Area where views are injected -->
+        <main id="main-content" class="view-container">
+            <!-- Initial Loader -->
+            <div class="loader-container">
+                <div class="loader"></div>
+            </div>
+        </main>
+
+        <!-- Top Header for Utility Actions -->
+        <header class="top-nav" style="position: absolute; top:0; right: 0; padding: 1rem; z-index: 50; display: flex; gap: 0.5rem; align-items: center;">
+            <button id="btn-export-data"
+                class="btn btn-sm btn-outline text-primary border-primary hover:bg-primary hover:text-white transition-colors flex items-center gap-1"
+                title="Export Data">
+                <span class="material-symbols-rounded text-sm">download</span>
+                Export
+            </button>
+            <button id="btn-import-data"
+                class="btn btn-sm btn-outline text-success border-success hover:bg-success hover:text-white transition-colors flex items-center gap-1"
+                title="Import Data">
+                <span class="material-symbols-rounded text-sm">upload</span>
+                Import
+            </button>
+            <input type="file" id="import-file-input" accept=".json" style="display: none;">
+            <button id="btn-reset-data"
+                class="btn btn-sm btn-outline text-danger border-danger hover:bg-danger hover:text-white transition-colors flex items-center gap-1"
+                title="Reset All Data">
+                <span class="material-symbols-rounded text-sm">delete_forever</span>
+                Reset Data
+            </button>
+        </header>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-view="dashboard" aria-label="Dashboard">
+                <span class="material-symbols-rounded">dashboard</span>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-view="accounts" aria-label="Accounts">
+                <span class="material-symbols-rounded">account_balance</span>
+                <span>Accounts</span>
+            </button>
+            <button class="nav-item" data-view="budgets" aria-label="Budgets">
+                <span class="material-symbols-rounded">calculate</span>
+                <span>Budgets</span>
+            </button>
+            <!-- FAB (Floating Action Button) for Transactions -->
+            <button class="nav-item fab-item" data-view="transaction-modal" aria-label="Add Transaction">
+                <div class="fab-wrapper">
+                    <span class="material-symbols-rounded">add</span>
+                </div>
+            </button>
+            <button class="nav-item" data-view="history" aria-label="History">
+                <span class="material-symbols-rounded">history</span>
+                <span>History</span>
+            </button>
+            <button class="nav-item" data-view="investments" aria-label="Investments">
+                <span class="material-symbols-rounded">trending_up</span>
+                <span>Invest</span>
+            </button>
+            <button class="nav-item" data-view="moneylent" aria-label="Money Lent">
+                <span class="material-symbols-rounded">handshake</span>
+                <span>Lent</span>
+            </button>
+            <button class="nav-item" data-view="accountinfo" aria-label="Account Info">
+                <span class="material-symbols-rounded">info</span>
+                <span>Info</span>
+            </button>
+        </nav>
+
+        <!-- Global Modals Container -->
+        <div id="modal-root"></div>
+
+        <!-- Global Drawer Overlay for Sub-Account details -->
+        <div id="drawer-overlay" class="drawer-overlay"></div>
+
+        <!-- Toast Notifications Container -->
+        <div id="toast-container"></div>
+
+        <!-- Floating Calculator Widget -->
+        <div id="calculator-widget" class="calculator-collapsed">
+            <button id="calc-toggle-btn" class="calc-toggle" aria-label="Toggle Calculator">
+                <span class="material-symbols-rounded">calculate</span>
+            </button>
+            <div class="calc-panel">
+                <div class="calc-header">
+                    <span class="calc-title">Calculator</span>
+                    <button id="calc-close-btn" class="btn-icon">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+                <div class="calc-display-container">
+                    <div id="calc-history" class="calc-history"></div>
+                    <div id="calc-display" class="calc-display">0</div>
+                </div>
+                <div class="calc-keypad">
+                    <button class="calc-btn calc-op" data-action="clear">C</button>
+                    <button class="calc-btn calc-op" data-action="delete">⌫</button>
+                    <button class="calc-btn calc-op" data-action="operator" data-val="/">÷</button>
+                    <button class="calc-btn calc-op" data-action="operator" data-val="*">×</button>
+
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn calc-op" data-action="operator" data-val="-">−</button>
+
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn calc-op" data-action="operator" data-val="+">+</button>
+
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn calc-equal" data-action="calculate" style="grid-row: span 2;">=</button>
+
+                    <button class="calc-btn" data-val="0" style="grid-column: span 2;">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Scripts -->
+    <script type="module" src="js/store.js"></script>
+    <script type="module" src="js/ui.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

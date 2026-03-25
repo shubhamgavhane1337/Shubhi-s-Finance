@@ -1,0 +1,137 @@
+/* App Level Layout */
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    /* Dynamic viewport for modern mobile */
+    position: relative;
+    overflow: hidden;
+    background: var(--clr-bg-dark);
+}
+
+/* Remove animated background for a professional look */
+#app::before {
+    display: none;
+}
+
+/* Core Container for Views */
+.view-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: calc(var(--bottom-nav-height) + var(--spacing-4));
+    /* Extra padding to prevent nav overlap */
+    position: relative;
+    z-index: 1;
+    scroll-behavior: smooth;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.view-container.loaded {
+    opacity: 1;
+}
+
+/* View Section Wrapper */
+.view-section {
+    display: none;
+    animation: fadeIn var(--transition-normal);
+    padding: var(--spacing-4);
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.view-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--bottom-nav-height);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 50;
+    padding: 0 var(--spacing-2);
+    /* Safe area for newer iPhones */
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Desktop/Tablet Override */
+@media (min-width: 768px) {
+    #app {
+        flex-direction: row-reverse;
+        /* Puts sidebar on the right */
+    }
+
+    .bottom-nav {
+        position: static;
+        /* Let flex layout handle it instead of fixed */
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        width: var(--sidebar-width);
+        min-width: var(--sidebar-width);
+        height: 100vh;
+        top: auto;
+        bottom: auto;
+        border-top: none;
+        border-left: 1px solid var(--border-light);
+        border-right: none;
+        padding: var(--spacing-6) var(--spacing-4);
+        padding-top: var(--spacing-8);
+        gap: var(--spacing-2);
+        background: var(--clr-bg-card);
+    }
+
+    .bottom-nav .nav-item {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        padding: var(--spacing-3) var(--spacing-4);
+        border-radius: var(--border-radius-md);
+        gap: var(--spacing-3);
+        margin-bottom: var(--spacing-1);
+    }
+
+    .bottom-nav .nav-item span:not(.material-symbols-rounded) {
+        display: inline;
+        font-size: var(--font-size-md);
+    }
+
+    .view-container {
+        padding-bottom: var(--spacing-4);
+        padding-left: 0;
+        padding-right: 0;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .view-section {
+        max-width: 1200px;
+        padding: var(--spacing-8);
+    }
+}
