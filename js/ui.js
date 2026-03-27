@@ -72,6 +72,9 @@ class UIManager {
             case 'moneylent':
                 this.renderMoneyLent(wrapper, data);
                 break;
+            case 'accountinfo':
+                this.renderAccountInfo(wrapper, data);
+                break;
             case 'settings':
                 this.renderSettings(wrapper, data);
                 break;
@@ -312,25 +315,26 @@ class UIManager {
             html += `
                 <div class="account-group">
                     <!-- Bank Header -->
-                    <div class="bank-header p-4 md:p-5 rounded-2xl mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 relative overflow-hidden group/bank" style="background: linear-gradient(135deg, var(--clr-bg-card), var(--clr-primary-variant)); border: 2px solid var(--clr-primary); box-shadow: var(--shadow-glow);">
+                    <div class="bank-header p-4 md:p-5 rounded-2xl mb-4 flex flex-col items-center justify-center gap-3 relative overflow-hidden group/bank" style="background: linear-gradient(135deg, var(--clr-bg-card), var(--clr-primary-variant)); border: 2px solid var(--clr-primary); box-shadow: var(--shadow-glow);">
                         <!-- Edit/Delete Actions Absolutely Positioned -->
                         <div class="bank-actions">
-                            <button class="btn-icon bg-black bg-opacity-50 hover:bg-primary text-white rounded p-1 transition-all btn-edit-account" data-accid="${acc.id}" title="Edit"><span class="material-symbols-rounded text-[14px]">edit</span></button>
-                            <button class="btn-icon bg-black bg-opacity-50 hover:bg-danger text-white rounded p-1 transition-all btn-delete-account" data-accid="${acc.id}" title="Delete"><span class="material-symbols-rounded text-[14px]">delete</span></button>
+                            <button class="btn-icon bg-black bg-opacity-50 hover:bg-primary text-white rounded p-2 transition-all btn-edit-account" data-accid="${acc.id}" aria-label="Edit Institution" title="Edit"><span class="material-symbols-rounded text-[16px]">edit</span></button>
+                            <button class="btn-icon bg-black bg-opacity-50 hover:bg-danger text-white rounded p-2 transition-all btn-delete-account" data-accid="${acc.id}" aria-label="Delete Institution" title="Delete"><span class="material-symbols-rounded text-[16px]">delete</span></button>
                         </div>
                         
-                        <div class="z-10 relative flex-1 w-full text-center md:text-left pr-14 md:pr-0">
-                            <div class="flex justify-center md:justify-start items-center gap-2 mb-1">
+                        <div class="z-10 relative flex flex-col items-center justify-center text-center w-full mt-2">
+                            <div class="flex items-center gap-2 mb-1">
                                 <span class="text-[10px] font-bold text-primary uppercase tracking-widest bg-black bg-opacity-40 px-2 py-0.5 rounded">Institution</span>
                             </div>
-                            <div class="text-2xl font-bold text-white drop-shadow-md">${acc.name}</div>
-                        </div>
-                        <div class="z-10 relative text-center md:text-right w-full md:w-auto bg-black bg-opacity-30 p-2 md:p-3 rounded-xl border border-white border-opacity-20 backdrop-blur-sm">
-                           <div class="text-[10px] text-white uppercase tracking-widest mb-1 opacity-80">Total Assets</div>
-                           <div style="display: flex; align-items: center; gap: 8px;">
-                               <div class="text-xl font-bold text-success drop-shadow-md">${this.formatCurrencyColor(acc.balance)}</div>
-                               <button class="btn-icon text-white transition-colors btn-edit-account-bal" style="opacity: 0.5; padding: 0;" onmouseover="this.style.opacity='1'; this.style.color='var(--clr-primary)';" onmouseout="this.style.opacity='0.5'; this.style.color='white';" data-accid="${acc.id}" title="Edit Balance"><span class="material-symbols-rounded" style="font-size: 14px; font-weight: 300;">edit</span></button>
-                           </div>
+                            <div class="text-2xl font-bold text-white drop-shadow-md mb-3">${acc.name}</div>
+                            
+                            <div class="bg-black bg-opacity-30 p-2 md:p-3 rounded-xl border border-white border-opacity-20 backdrop-blur-sm flex flex-col items-center justify-center min-w-[200px]" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);">
+                                <div class="text-[10px] text-white uppercase tracking-widest mb-1 opacity-80">Total Assets</div>
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <div class="text-xl font-bold drop-shadow-md">${this.formatCurrencyColor(acc.balance)}</div>
+                                    <button class="btn-icon text-white transition-colors btn-edit-account-bal" style="opacity: 0.5; padding: 0;" onmouseover="this.style.opacity='1'; this.style.color='var(--clr-primary)';" onmouseout="this.style.opacity='0.5'; this.style.color='white';" data-accid="${acc.id}" title="Edit Balance"><span class="material-symbols-rounded" style="font-size: 14px; font-weight: 300;">edit</span></button>
+                                </div>
+                            </div>
                         </div>
                         <!-- decorative background blob -->
                         <div class="absolute -right-10 -top-10 w-48 h-48 bg-secondary opacity-30 rounded-full blur-3xl pointer-events-none"></div>
@@ -961,51 +965,130 @@ class UIManager {
         let html = `
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="text-2xl">Account Info</h2>
-                    <p class="text-muted text-sm">Information regarding different accounts</p>
+                    <h2 class="text-2xl font-bold text-gradient-aurora">Account Info</h2>
+                    <p class="text-muted text-sm mt-1">Organize information into departments</p>
                 </div>
-                <button class="btn btn-primary" id="btn-add-info">
-                    <span class="material-symbols-rounded">add</span>
+                <button class="btn btn-primary btn-round shadow-glow" id="btn-add-info-dept" aria-label="Add Department">
+                    <span class="material-symbols-rounded">create_new_folder</span>
                 </button>
             </div>
             
-            <div class="flex-col gap-4">
+            <div class="flex-col gap-6">
         `;
 
+        const depts = data.infoDepartments || [];
         const infoEntries = data.accountInfo || [];
-        if (infoEntries.length === 0) {
-            html += `<div class="glass-panel p-6 text-center text-muted">No information saved yet.</div>`;
-        }
 
-        infoEntries.forEach(info => {
-            html += `
-                <div class="glass-panel p-4 mb-2">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="font-bold text-lg text-primary">${info.name}</div>
-                        <div class="font-bold text-lg">${this.formatCurrency(info.amount)}</div>
+        if (depts.length === 0) {
+            html += `<div class="glass-panel p-8 text-center text-muted border-dashed mb-6">No departments created yet. Add a department to start.</div>`;
+        } else {
+            depts.forEach(dept => {
+                // Filter rows for this department
+                const rowsData = infoEntries.filter(i => i.departmentId === dept.id);
+                let rowsHtml = '';
+                
+                if (rowsData.length === 0) {
+                    rowsHtml = `<tr><td colspan="4" class="p-4 text-center text-sm text-muted italic">No records added.</td></tr>`;
+                } else {
+                    rowsData.forEach(info => {
+                        rowsHtml += `
+                            <tr class="border-b border-light border-opacity-30 hover:bg-white hover:bg-opacity-5 transition-colors group/row">
+                                <td class="p-3 font-medium text-white align-top">${info.name}</td>
+                                <td class="p-3 font-bold align-top whitespace-nowrap">${this.formatCurrencyColor(info.amount)}</td>
+                                <td class="p-3 text-sm text-muted whitespace-pre-line break-words align-top max-w-[200px]">${info.description || '-'}</td>
+                                <td class="p-3 text-right align-top w-12">
+                                    <button class="btn-icon text-muted hover:text-danger btn-delete-info-row opacity-50 group-hover/row:opacity-100 transition-opacity" data-id="${info.id}" title="Delete Row"><span class="material-symbols-rounded text-[18px]">close</span></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                html += `
+                    <div class="glass-panel overflow-hidden relative shadow-md mb-6">
+                        <div class="p-4 border-b border-light flex justify-between items-center" style="background: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%);">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-rounded text-primary text-xl">folder_open</span>
+                                <h3 class="text-xl font-bold text-white">${dept.name}</h3>
+                            </div>
+                            <button class="btn-icon text-muted hover:text-danger btn-delete-info-dept transition-colors" data-id="${dept.id}" title="Delete Department"><span class="material-symbols-rounded text-sm">delete</span></button>
+                        </div>
+                        
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse" style="min-width: 400px;">
+                                <thead>
+                                    <tr class="text-[10px] text-muted uppercase tracking-widest border-b border-light" style="background: rgba(0,0,0,0.2);">
+                                        <th class="p-3 font-semibold w-1/4">Name</th>
+                                        <th class="p-3 font-semibold w-1/4">Amount</th>
+                                        <th class="p-3 font-semibold w-auto">Description</th>
+                                        <th class="p-3 font-semibold text-right w-16">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-2 border-t border-light text-center" style="background: rgba(0,0,0,0.3);">
+                            <button class="btn btn-sm text-primary hover:bg-primary hover:bg-opacity-20 w-full rounded-lg transition-colors py-2 flex items-center justify-center btn-add-info-row" data-deptid="${dept.id}">
+                                <span class="material-symbols-rounded text-[16px] mr-1">add</span> Add Row
+                            </button>
+                        </div>
                     </div>
-                    <div class="text-sm text-muted whitespace-pre-line">${info.description}</div>
-                </div>
-            `;
-        });
+                `;
+            });
+        }
 
         html += `</div>`;
         container.innerHTML = html;
 
-        container.querySelector('#btn-add-info')?.addEventListener('click', () => {
-            const name = prompt("Account Name (e.g., Savings Goal):");
-            if (name) {
-                const amountStr = prompt("Amount:");
-                const amount = parseFloat(amountStr);
-                if (!isNaN(amount)) {
-                    const description = prompt("Description/Details:") || '';
+        // Event Listeners
+        container.querySelector('#btn-add-info-dept')?.addEventListener('click', () => {
+            const name = prompt("Enter new department name:");
+            if (name && name.trim()) {
+                store.addInfoDepartment(name.trim());
+                this.renderAccountInfo(container, store.data);
+            }
+        });
+
+        container.querySelectorAll('.btn-add-info-row').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const deptId = e.currentTarget.dataset.deptid;
+                const name = prompt("Record Name:");
+                if (name && name.trim()) {
+                    const amountStr = prompt("Amount (INR):", "0");
+                    const amount = parseFloat(amountStr) || 0;
+                    const description = prompt("Description/Details (Optional):") || '';
                     store.addAccountInfo({
-                        name,
+                        departmentId: deptId,
+                        name: name.trim(),
                         amount,
                         description
                     });
+                    this.renderAccountInfo(container, store.data);
                 }
-            }
+            });
+        });
+
+        container.querySelectorAll('.btn-delete-info-dept').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const deptId = e.currentTarget.dataset.id;
+                if (confirm("Delete this department and all its records?")) {
+                    store.deleteInfoDepartment(deptId);
+                    this.renderAccountInfo(container, store.data);
+                }
+            });
+        });
+
+        container.querySelectorAll('.btn-delete-info-row').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                if (confirm("Delete this record?")) {
+                    store.deleteAccountInfo(id);
+                    this.renderAccountInfo(container, store.data);
+                }
+            });
         });
     }
 
@@ -1306,25 +1389,51 @@ class UIManager {
                 
                 bulkSection.style.display = 'block';
                 bulkContainer.innerHTML = depts.map(d => `
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="flex items-center text-sm cursor-pointer flex-1 text-white">
-                            <input type="checkbox" class="mr-2 bulk-player-check form-checkbox" data-deptid="${d.id}" checked>
-                            ${d.name}
-                        </label>
-                        <div class="flex items-center ml-2">
-                            <span class="text-xs text-muted mr-2">Shares:</span>
-                            <input type="number" class="bulk-player-shares w-16 bg-surface text-center p-1 rounded border border-light text-sm" data-deptid="${d.id}" value="1" min="1">
+                    <div class="flex items-center justify-between p-2 bg-black bg-opacity-20 border border-light rounded-xl mb-2 transition-opacity player-row" data-deptid="${d.id}" style="opacity: 0.6;">
+                        <input type="hidden" class="bulk-player-shares" data-deptid="${d.id}" value="0">
+                        <div class="text-white font-medium pl-2">${d.name}</div>
+                        <div class="flex items-center bg-black bg-opacity-40 rounded-full p-1 border border-white border-opacity-10">
+                            <button type="button" class="btn-icon w-10 h-10 rounded-full bg-surface hover:bg-danger hover:text-white transition-colors flex items-center justify-center btn-share-minus" aria-label="Decrease shares" data-deptid="${d.id}"><span class="material-symbols-rounded text-[20px]">remove</span></button>
+                            <div class="w-10 text-center font-bold text-xl share-count" aria-live="polite" data-deptid="${d.id}">0</div>
+                            <button type="button" class="btn-icon w-10 h-10 rounded-full bg-surface hover:bg-success hover:text-white transition-colors flex items-center justify-center btn-share-plus" aria-label="Increase shares" data-deptid="${d.id}"><span class="material-symbols-rounded text-[20px]">add</span></button>
                         </div>
                     </div>
                 `).join('');
                 
-                updateBulkSummary();
-                
                 // Add listeners to new inputs
-                bulkContainer.querySelectorAll('input').forEach(input => {
-                    input.addEventListener('change', updateBulkSummary);
-                    input.addEventListener('input', updateBulkSummary);
+                bulkContainer.querySelectorAll('.btn-share-plus').forEach(btn => {
+                    btn.addEventListener('click', (ev) => {
+                        ev.preventDefault();
+                        const dId = ev.currentTarget.dataset.deptid;
+                        const input = bulkContainer.querySelector(`.bulk-player-shares[data-deptid="${dId}"]`);
+                        const display = bulkContainer.querySelector(`.share-count[data-deptid="${dId}"]`);
+                        const row = bulkContainer.querySelector(`.player-row[data-deptid="${dId}"]`);
+                        let val = parseInt(input.value) || 0;
+                        val++;
+                        input.value = val;
+                        display.textContent = val;
+                        if (val > 0) row.style.opacity = '1';
+                        updateBulkSummary();
+                    });
                 });
+
+                bulkContainer.querySelectorAll('.btn-share-minus').forEach(btn => {
+                    btn.addEventListener('click', (ev) => {
+                        ev.preventDefault();
+                        const dId = ev.currentTarget.dataset.deptid;
+                        const input = bulkContainer.querySelector(`.bulk-player-shares[data-deptid="${dId}"]`);
+                        const display = bulkContainer.querySelector(`.share-count[data-deptid="${dId}"]`);
+                        const row = bulkContainer.querySelector(`.player-row[data-deptid="${dId}"]`);
+                        let val = parseInt(input.value) || 0;
+                        if (val > 0) val--;
+                        input.value = val;
+                        display.textContent = val;
+                        if (val === 0) row.style.opacity = '0.6';
+                        updateBulkSummary();
+                    });
+                });
+
+                updateBulkSummary();
                 
             } else {
                 // Normal Mode
@@ -1345,13 +1454,11 @@ class UIManager {
 
         const updateBulkSummary = () => {
             const amount = parseFloat(document.getElementById('tx-amount').value) || 0;
-            const checks = document.querySelectorAll('.bulk-player-check:checked');
+            const shareInputs = document.querySelectorAll('.bulk-player-shares');
             let totalShares = 0;
             
-            checks.forEach(chk => {
-                const deptId = chk.dataset.deptid;
-                const sharesInput = document.querySelector(`.bulk-player-shares[data-deptid="${deptId}"]`);
-                totalShares += parseInt(sharesInput.value) || 1;
+            shareInputs.forEach(input => {
+                totalShares += parseInt(input.value) || 0;
             });
             
             const summaryDiv = document.getElementById('bulk-split-summary');
@@ -1359,7 +1466,7 @@ class UIManager {
                 const perShare = amount / totalShares;
                 summaryDiv.innerHTML = `Split across ${totalShares} total shares. Cost per share: ${this.formatCurrency(perShare)}`;
             } else {
-                summaryDiv.innerHTML = 'Select at least one player to split.';
+                summaryDiv.innerHTML = 'Add shares using [+] to select players.';
             }
         };
 
@@ -1393,15 +1500,17 @@ class UIManager {
             const bulkSection = document.getElementById('bulk-split-section');
             if (bulkSection && bulkSection.style.display === 'block') {
                 // Turf Bulk Split Submit
-                const checks = document.querySelectorAll('.bulk-player-check:checked');
+                const inputs = document.querySelectorAll('.bulk-player-shares');
                 let totalShares = 0;
                 const players = [];
                 
-                checks.forEach(chk => {
-                    const dId = chk.dataset.deptid;
-                    const shares = parseInt(document.querySelector(`.bulk-player-shares[data-deptid="${dId}"]`).value) || 1;
-                    totalShares += shares;
-                    players.push({ id: dId, shares });
+                inputs.forEach(input => {
+                    const shares = parseInt(input.value) || 0;
+                    if (shares > 0) {
+                        const dId = input.dataset.deptid;
+                        totalShares += shares;
+                        players.push({ id: dId, shares });
+                    }
                 });
                 
                 if (totalShares === 0) {

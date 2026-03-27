@@ -16,7 +16,8 @@ const defaultState = {
     budgets: [], // { id, weekStarting, amount, accountId, subAccountId, departmentId }
     investments: [], // { id, date, name, amount, currentValuation }
     moneyLent: [], // { id, date, name, amount, description, status: 'lent'|'repaid' }
-    accountInfo: [] // { id, name, amount, description }
+    infoDepartments: [], // { id, name }
+    accountInfo: [] // { id, departmentId, name, amount, description }
 };
 
 class Store {
@@ -448,11 +449,37 @@ class Store {
     }
 
     // --- Account Info ---
+    addInfoDepartment(name) {
+        const newDept = { id: this.generateId(), name };
+        if (!this.data.infoDepartments) this.data.infoDepartments = [];
+        this.data.infoDepartments.push(newDept);
+        this.saveData();
+        return newDept;
+    }
+
+    deleteInfoDepartment(id) {
+        if (this.data.infoDepartments) {
+            this.data.infoDepartments = this.data.infoDepartments.filter(d => d.id !== id);
+        }
+        if (this.data.accountInfo) {
+            this.data.accountInfo = this.data.accountInfo.filter(i => i.departmentId !== id);
+        }
+        this.saveData();
+    }
+
     addAccountInfo(info) {
         const newInfo = { id: this.generateId(), ...info };
+        if (!this.data.accountInfo) this.data.accountInfo = [];
         this.data.accountInfo.push(newInfo);
         this.saveData();
         return newInfo;
+    }
+
+    deleteAccountInfo(id) {
+        if (this.data.accountInfo) {
+            this.data.accountInfo = this.data.accountInfo.filter(i => i.id !== id);
+            this.saveData();
+        }
     }
 }
 
